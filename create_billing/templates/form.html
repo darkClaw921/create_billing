@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма заполнения</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/inputmask"></script>
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js'></script><script  src="{{ url_for('static', filename='js/index.js') }}"></script> -->
+    <script>
+        function addSalePlan() {
+            var form = document.getElementById("salesForm");
+            var newPlan = document.createElement("div");
+            var uniqueId = Date.now();
+            newPlan.className = "sale-plan";
+            newPlan.innerHTML = `
+            <table >
+                    <tr>
+                        <td> 
+                    <label for="start_date">Дата начала:</label>
+                    <input type="date" name="start_date[]" required onchange="updateSalesPlans(this, '${uniqueId}')"><br><br>
+
+                    <label for="plan">План:</label>
+                    <input type="number" name="plan[]" required onchange="updateSalesPlans(this, '${uniqueId}')"><br><br>
+                    
+                    <label for="fackt">Факт:</label>
+                    <input type="number" name="fackt[]" onchange="updateSalesPlans(this, '${uniqueId}')"><br><br>
+
+                        
+                    <label for="product">Продукт:</label>
+                    <select name="product[]" required onchange="updateSalesPlans(this, '${uniqueId}')">
+                        {% for product in products %}
+                        <option value="{{ product }}">{{ product }}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    
+                    <label for="department">Отдел:</label>
+                            <select name="department[]" required onchange="updateProduct(this, '${uniqueId}')">
+                                {% for department in departments %}
+                                <option value="{{ department }}">{{ department }}</option>
+                                {% endfor %}
+                            </select><br><br>
+                            
+                    <label for="month">Месяц:</label>
+                    <select name="month[]" required onchange="updateSalesPlans(this, '${uniqueId}')">
+                        {% for month in months %}
+                        <option value="{{ month }}">{{ month }}</option>
+                        {% endfor %}
+                    </select><br><br>
+                    
+                    </td>
+                <td>
+
+                <div class="sales-plans-container" id="salesPlans_${uniqueId}">
+                    <!-- Здесь будет выводиться информация из базы данных -->
+                </div>
+            </td>
+            </table>
+            <button type="button" onclick="removeSalePlan(this)">Удалить</button>
+                `;
+            form.insertBefore(newPlan, form.lastChild);
+        }
+
+        function removeSalePlan(button) {
+            var plan = button.parentNode;
+            plan.parentNode.removeChild(plan);
+        }
+
+        
+        // <label for="title">Название:</label>
+        // <input type="text" id="formatted-input" placeholder="Биллинг №1" name="title[]" onchange="updateSalesPlans(this, '1')"><br><br>
+        
+        // <label for="start_date">Дата начала:</label>
+        // <input type="date" name="start_date[]" required><br><br>
+
+        // <label for="hours">Часы:</label>
+        // <input type="text" placeholder="0" name="hours[]" ><br><br>
+        
+        // <label for="minutes">Минуты:</label>
+        // <input type="text" placeholder="0" name="minutes[]" ><br><br>
+
+        // <label for="assigned">Ответственный:</label>
+        // <select name="assigned[]" required onchange="updateSalesPlans(this, '1')">
+        //     {% for assigned in assigneds %}
+        //     <option value="{{ assigned }}">{{ assigned }}</option>
+        //     {% endfor %}
+        // </select><br><br>
+
+
+        function updateSalesPlans(input, containerId) {
+            console.log('updateSalesPlans')
+            var startDate = input.parentNode.querySelector("input[name='start_date[]']").value;
+            var title = input.parentNode.querySelector("input[name='title[]']").value;
+            // var hours = input.parentNode.querySelector("input[name='hours[]']").value;
+            // var minutes = input.parentNode.querySelector("select[name='minutes[]']").value;
+            var assigned = input.parentNode.querySelector("select[name='assigned[]']").value;
+            var project= input.parentNode.querySelector("select[name='project[]']").value;
+            
+            // var metrik = input.parentNode.querySelector("select[name='metrik[]']").value;
+            // var metrikMonth = input.parentNode.querySelector("select[name='metrikMonth[]']").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var salesPlansDiv = document.getElementById('salesPlans_'+containerId);
+                    salesPlansDiv.innerHTML = xhr.responseText;
+                }
+            }
+        
+            // xhr.open("GET", "/sales_plans?start_date=" + startDate + "&plan=" + plan + "&product=" + product, true);
+            xhr.open("GET", "/sales_plans?start_date=" + startDate 
+            + "&title=" + title 
+            // + "&hours=" + hours 
+            // + "&minutes=" + minutes
+            + "&assigned=" + assigned
+            + "&project=" + project, true);
+            
+            xhr.send();
+        }
+
+        function createBilling(input, containerId) {
+            console.log('createBilling')
+            var startDate = input.parentNode.querySelector("input[name='start_date[]']").value;
+            var title = input.parentNode.querySelector("input[name='title[]']").value;
+            var hours = input.parentNode.querySelector("input[name='hours[]']").value;
+            var minutes = input.parentNode.querySelector("input[name='minutes[]']").value;
+            var assigned = input.parentNode.querySelector("select[name='assigned[]']").value;
+            var project= input.parentNode.querySelector("select[name='project[]']").value;
+            
+            // var metrik = input.parentNode.querySelector("select[name='metrik[]']").value;
+            // var metrikMonth = input.parentNode.querySelector("select[name='metrikMonth[]']").value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var salesPlansDiv = document.getElementById('salesPlans_'+containerId);
+                    salesPlansDiv.innerHTML = xhr.responseText;
+                }
+            }
+        
+            // xhr.open("GET", "/sales_plans?start_date=" + startDate + "&plan=" + plan + "&product=" + product, true);
+            xhr.open("GET", "/create-billing?start_date=" + startDate 
+            + "&title=" + title 
+            + "&hours=" + hours 
+            + "&minutes=" + minutes
+            + "&assigned=" + assigned
+            + "&project=" + project, true);
+            
+            xhr.send();
+            
+            // updateSalesPlans(input, containerId)
+        }
+        
+        // function updateProduct(input, containerId) {
+        function updateMetrik(input, containerId) {
+            console.log('updateMetrik')
+      
+            var element = input.parentNode.querySelector("select[name='department[]']")
+            
+            var department = input.parentNode.querySelector("select[name='department[]']").value;
+           
+            var xhr = new XMLHttpRequest();
+            // xhr.open("GET", "/" + "?department=" + department, true);
+            xhr.open("GET", "/get_metrik_for_department" + "?department=" + department, true);
+            // console.log('url open')
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // console.log(xhr.responseText)
+                    var products = JSON.parse(xhr.responseText);
+                    var productSelect = document.querySelector("select[name='metrik[]']");
+                    // console.log(products)
+                    productSelect.innerHTML = '';
+                    products.forEach(function(metrik) {
+                        var option = document.createElement('option');
+                        option.value = metrik;
+                        option.text = metrik;
+                        productSelect.appendChild(option);
+                    });
+                }
+            };
+            xhr.send();
+            updateProduct(input, containerId); 
+        }
+        
+        function updateProduct(input, containerId) {
+            // console.log('updateMetrik')
+            console.log('updateProduct')
+            // updateMetrik 
+            var element = input.parentNode.querySelector("select[name='product[]']")
+            
+            var metrik = input.parentNode.querySelector("select[name='metrik[]']").value;
+            var department = input.parentNode.querySelector("select[name='department[]']").value;
+
+            var xhr = new XMLHttpRequest();
+            // xhr.open("GET", "/" + "?department=" + department, true);
+            xhr.open("GET", "/get_products_for_department" + "?metrik=" + metrik + "&department=" + department, true);
+            // console.log('url open')
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // console.log(xhr.responseText)
+                    var products = JSON.parse(xhr.responseText);
+                    var productSelect = document.querySelector("select[name='product[]']");
+                    // console.log(products)
+                    productSelect.innerHTML = '';
+                    products.forEach(function(product) {
+                        var option = document.createElement('option');
+                        option.value = product;
+                        option.text = product;
+                        productSelect.appendChild(option);
+                    });
+                }
+            };
+            xhr.send();
+
+             
+
+
+        }
+       
+
+    </script>
+</head>
+<body onload="updateSalesPlans()">
+    <div class="form-container" >
+        <h1>Форма заполнения</h1>
+        <form method="post" id="salesForm">
+            
+            <div class="sale-plan" id="a">
+                <table >
+                    <tr>
+                        <td>
+
+                            <label for="project">Проект:</label>
+                            <select name="project[]" required onchange="updateSalesPlans(this, '1')">
+                                {% for project in projects %}
+                                    <option value="{{ loop.index0 }}">{{ project[0] }}</option>
+                                {% endfor %}
+                            </select><br><br>
+
+                            <label for="assigned">Ответственный:</label>
+                            <select name="assigned[]" required onchange="updateSalesPlans(this, '1')">
+                                {% for assigned in assigneds %}
+                                <option value="{{ loop.index0 }}">{{ assigned[0] }}</option>
+                                {% endfor %}
+                            </select><br><br>
+
+
+                            <label for="title">Название:</label>
+                            <input type="text" id="formatted-input" placeholder="Биллинг №1" name="title[]" onchange="updateSalesPlans(this, '1')"><br><br>
+                            
+                            <label for="start_date">Дата начала:</label>
+                            <input type="date" name="start_date[]" required><br><br>
+
+                            <label for="hours">Часы:</label>
+                            <input type="text" placeholder="0" name="hours[]" ><br><br>
+                            
+                            <label for="minutes">Минуты:</label>
+                            <input type="text" placeholder="0" name="minutes[]" ><br><br>
+
+                            
+                            <!-- <label for="fackt">Факт:</label>
+                            <input type="text" id="formatted-input2" name="fackt[]" onchange="updateSalesPlans(this, '1')"><br><br> -->
+
+                            <!-- <label for="month">Месяц:</label>
+                            <select name="month[]" required onchange="updateSalesPlans(this, '1')">
+                                {% for month in months %}
+                                <option value="{{ month }}">{{ month }}</option>
+                                {% endfor %}
+                            </select><br><br> -->
+
+                            
+
+
+
+
+
+                        </td>
+                        
+                            
+
+                        
+                        <td>
+                            <div class="sales-plans-container">
+                                <h2>Активные биллинги проекта</h2>
+                                <div class="sales-plans-container" id="salesPlans_1">
+                                    
+                                </div>
+                            </div>
+                        </td>
+
+
+
+
+
+                    </tr>
+                </table>
+                <!-- <button type="button" onclick="removeSalePlan(this)">Удалить</button> -->
+            </div>
+            
+        </form>
+        <!-- <script>
+            Inputmask("999 999 999 999").mask(document.getElementById('formatted-input'));
+            Inputmask("999 999 999 999").mask(document.getElementById('formatted-input2'));
+        </script> -->
+        
+        <!-- <script>
+            var im = new Inputmask("numeric", {
+                groupSeparator: " ",
+                radixPoint: ",",
+                autoGroup: true,
+                digits: 2,
+                rightAlign: false,
+            });
+            im.mask(document.getElementById('formatted-input'));
+        </script>  -->
+        
+        
+        <!-- <label for="info">Примечание:</label> -->
+        <!-- <label for="info1">План/Факт на месяц вносится на 1 число</label> -->
+        <!-- <label for="info2">План/Факт на неделю вносится на понедельник</label> -->
+        <!-- <label for="info3"> </label> -->
+        <div class="button-container">
+            <!-- <button type="button" onclick="addSalePlan()">Добавить новый план</button> -->
+            <br><br>
+            <!-- HTML !-->
+            <!-- <button class="button-70" role="button">Сохранить</button>
+            <button class="button-63" form="salesForm" type="submit"  role="button">Сохранить</button> -->
+            <button class="button-63" form="salesForm12" type="submit" role="button" onclick="createBilling(document.getElementById('salesForm'), '1')">Сохранить</button>
+                
+            <!-- <button type="submit" form="salesForm">Сохранить</button> -->
+        </div>
+    </div>
+    
+</body>
+</html>
