@@ -90,6 +90,7 @@
 
         function updateSalesPlans(input, containerId) {
             console.log('updateSalesPlans')
+            // document.getElementById('loader_1').style.display = 'block';
             var startDate = input.parentNode.querySelector("input[name='start_date[]']").value;
             var title = input.parentNode.querySelector("input[name='title[]']").value;
             // var hours = input.parentNode.querySelector("input[name='hours[]']").value;
@@ -101,10 +102,12 @@
             // var metrikMonth = input.parentNode.querySelector("select[name='metrikMonth[]']").value;
 
             var xhr = new XMLHttpRequest();
+            document.getElementById('loader_1').style.display = 'block'; // Показать анимацию загрузки
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var salesPlansDiv = document.getElementById('salesPlans_'+containerId);
                     salesPlansDiv.innerHTML = xhr.responseText;
+                    document.getElementById('loader_1').style.display = 'none'; // Показать анимацию загрузки
                 }
             }
         
@@ -117,9 +120,12 @@
             + "&project=" + project, true);
             
             xhr.send();
+
+            // document.getElementById('loader_1').style.display = 'none';
         }
 
         function createBilling(input, containerId) {
+            
             console.log('createBilling')
             var startDate = input.parentNode.querySelector("input[name='start_date[]']").value;
             var title = input.parentNode.querySelector("input[name='title[]']").value;
@@ -133,10 +139,17 @@
 
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
+                document.getElementById('loader_1').style.display = 'block';
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var salesPlansDiv = document.getElementById('salesPlans_'+containerId);
                     salesPlansDiv.innerHTML = xhr.responseText;
+                    // return true
+                    document.getElementById('loader_1').style.display = 'none';
                 }
+                // else{
+                //     return false
+                // }
+                
             }
         
             // xhr.open("GET", "/sales_plans?start_date=" + startDate + "&plan=" + plan + "&product=" + product, true);
@@ -148,6 +161,18 @@
             + "&project=" + project, true);
             
             xhr.send();
+
+            // setTimeout()
+            // console.log(xhr.status) 
+            // if (xhr.status == 200){
+            //     return true
+            // }
+            // else{
+            //     return false
+            // }
+            // return true
+            
+            
             
             // updateSalesPlans(input, containerId)
         }
@@ -284,8 +309,9 @@
                             <div class="sales-plans-container">
                                 <h2>Активные биллинги проекта</h2>
                                 <div class="sales-plans-container" id="salesPlans_1">
-                                    
+                                    <!-- <div class="loader" id="loader_1" style="display: none;"></div>  -->
                                 </div>
+                                <div class="loader" id="loader_1" style="display: none;"></div> 
                             </div>
                         </td>
 
@@ -327,6 +353,7 @@
             <!-- <button class="button-70" role="button">Сохранить</button>
             <button class="button-63" form="salesForm" type="submit"  role="button">Сохранить</button> -->
             <button class="button-63" form="salesForm12" type="submit" role="button" onclick="createBilling(document.getElementById('salesForm'), '1')">Сохранить</button>
+            <!-- <button class="button-63" form="salesForm12" type="submit" role="button" onclick="if(createBilling(document.getElementById('salesForm'), '1')) { alert('Успешно'); } else { alert('Произошла ошибка'); }">Сохранить</button> -->
                 
             <!-- <button type="submit" form="salesForm">Сохранить</button> -->
         </div>

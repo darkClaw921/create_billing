@@ -249,7 +249,7 @@ def create_billing_item_a():
             BillingItem.project: project,
         }
     pprint(fields)
-    create_billing_item(fields)
+    # create_billing_item(fields)
     #TODO сделать создание биллинга
 
     # sales_plans=[{'title':'2None'}]
