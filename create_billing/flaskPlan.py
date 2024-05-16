@@ -120,6 +120,8 @@ def sales_plan():
    
     
     # metriks = departmentsProduct['Отдел огнеупор']['metrick'].keys() 
+    pprint(request.form)
+    pprint(requests.__dict__)
     projects=get_all_project_item()
     pprint(projects)
     users=get_all_users()
